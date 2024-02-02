@@ -98,27 +98,36 @@ let currentModal;
 gallery.addEventListener('click', (event) => {
 	event.preventDefault();
 
-	const clickedImage = event.target.closest('.gallery-item').querySelector('img');
-	//console.log('Clicked:', event.target);
-	//console.log('Clicked:', event.currentTarget);
+	const clickedGalleryItem = event.target.closest('.gallery-item');
 
-	if (clickedImage) {
+	if (clickedGalleryItem) {
+		const clickedImage = clickedGalleryItem.querySelector('img');
 		const largeImageSrc = clickedImage.dataset.source;
-
+		//console.log('Clicked:', event.target);
+		//console.log('Clicked:', event.currentTarget);
 		console.log('Link to the large image:', largeImageSrc);
 
 		currentModal = basicLightbox.create(
 			`<div class="modal">
-        <img src="${largeImageSrc}" alt="${clickedImage.alt}" width="1112" height="640">
-      </div>`
+				<img src="${largeImageSrc}" alt="${clickedImage.alt}" width="1112" height="640">
+			</div>`,
+			{
+				onShow: () => {
+					document.addEventListener('keyup', handleKeyUp);
+				},
+				onClose: () => {
+					document.removeEventListener('keyup', handleKeyUp);
+				},
+			}
 		);
+
 		currentModal.show();
 	}
 });
-
-document.addEventListener('keyup', ({ code }) => {
-	if (code !== 'Escape' || !currentModal) {
+function handleKeyUp(event) {
+	if (event.code !== 'Escape' || !currentModal) {
 		return;
 	}
 	currentModal.close();
-});
+}
+
